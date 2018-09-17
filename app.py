@@ -56,9 +56,25 @@ def mirror(name):
 
 @app.route("/users")
 def users():
+    team = request.args.get('team')
     data = db.get("users")
+    if team != None:
+        new_data = []
+        for i in range(len(data)):
+            if data[i]["team"] == team:
+                new_data.append(data[i])
+        data = new_data
     dic = {"users": data}
     return create_response(dic)
+
+@app.route("/users/<id>")
+def user_id(id):
+    data = db.getById("users", int(id))
+    if data == None:
+        return create_response(status=404, message="User not found.")
+    else:
+        return create_response(data)
+
 
 """
 ~~~~~~~~~~~~ END API ~~~~~~~~~~~~
