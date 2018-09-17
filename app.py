@@ -96,6 +96,13 @@ def update_user(id):
     else:
         return create_response(status=201, data=updated, message="User updated.")
 
+@app.route("/users/<id>", methods=["DELETE"])
+def delete_user(id):
+    if db.getById("users", int(id)) == None:
+        return create_response(status=404, message="User not found.")
+
+    db.deleteById("users", int(id))
+    return create_response(status=201, message="User deleted.")
 
 """
 ~~~~~~~~~~~~ END API ~~~~~~~~~~~~
