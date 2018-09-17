@@ -54,26 +54,47 @@ def mirror(name):
 
 # TODO: Implement the rest of the API here!
 
-@app.route("/users")
+@app.route("/users", methods=['GET','POST'])
 def users():
-    team = request.args.get('team')
-    data = db.get("users")
-    if team != None:
-        new_data = []
-        for i in range(len(data)):
-            if data[i]["team"] == team:
-                new_data.append(data[i])
-        data = new_data
-    dic = {"users": data}
-    return create_response(dic)
+    if request.method == 'GET':
+        team = request.args.get('team')
+        data = db.get("users")
+        if team != None:
+            new_data = []
+            for i in range(len(data)):
+                if data[i]["team"] == team:
+                    new_data.append(data[i])
+            data = new_data
+        dic = {"users": data}
+        return create_response(dic)
+    elif request.method == 'POST':
+        name = request.form.get('name')
+        age = request.form.get('age')
+        team = request.form.get('team')
+        if name == None or age == None or team == None:
+            return create_response(status=422, message="One or more parameters is missing.")
+        else:
+            payload = {"name": name, "age": age, "team": team}
+            db.create("users",payload)
+            return create_response(status=201, data=payload)
+    else:
+        return create_response(status=400, message="Malformed request.")
 
-@app.route("/users/<id>")
+@app.route("/users/<id>", methods=["GET"])
 def user_id(id):
     data = db.getById("users", int(id))
     if data == None:
         return create_response(status=404, message="User not found.")
     else:
         return create_response(data)
+
+@app.route("/users/<id>", methods=["PUT"])
+def update_user(id):
+    updated = db.updateById("users",int(id),request.form)
+    if updated == None:
+        return create_response(status=404, message="User not found.")
+    else:
+        return create_response(status=201, data=updated, message="User updated.")
 
 
 """
