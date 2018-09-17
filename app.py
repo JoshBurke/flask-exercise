@@ -74,9 +74,9 @@ def users():
         if name == None or age == None or team == None:
             return create_response(status=422, message="One or more parameters is missing.")
         else:
-            payload = {"name": name, "age": age, "team": team}
+            payload = {"name": name, "age": int(age), "team": team}
             db.create("users",payload)
-            return create_response(status=201, data=payload)
+            return create_response(status=201, data={"user": payload})
     else:
         return create_response(status=400, message="Malformed request.")
 
@@ -86,7 +86,7 @@ def user_id(id):
     if data == None:
         return create_response(status=404, message="User not found.")
     else:
-        return create_response(data)
+        return create_response({"user": data})
 
 @app.route("/users/<id>", methods=["PUT"])
 def update_user(id):
@@ -94,7 +94,7 @@ def update_user(id):
     if updated == None:
         return create_response(status=404, message="User not found.")
     else:
-        return create_response(status=201, data=updated, message="User updated.")
+        return create_response(status=201, data={"user":updated}, message="User updated.")
 
 @app.route("/users/<id>", methods=["DELETE"])
 def delete_user(id):
